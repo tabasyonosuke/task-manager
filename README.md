@@ -6,3 +6,13 @@
 - migration に tasks テーブル追加
 - tasks/index.blade.php 作成
 - php artisan serve と npm run dev を同時に起動して動作確認
+
+## 実装済みタスク(2026-1-2)
+- tasks/index.blade.php の実装・修正
+- タスク一覧表示機能
+- 完了 / 未完了の表示切り替え（UI）
+- is_completed カラムの追加（Migration）
+- チェックボックスによる状態切り替え機能
+- 完了切り替え用ルート（Route）の追加・調整
+- Blade の構文エラー修正 (@if($tasks->isEmpty()))
+- ローカル環境での動作確認済み
