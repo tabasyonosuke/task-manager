@@ -10,8 +10,9 @@ class TaskController extends Controller
     // タスク一覧表示
     public function index()
     {
-        $tasks = Task::all();
-        return view('tasks.index', compact('tasks'));
+        $incompleteTasks = Task::where('is_completed', false)->get();
+        $completedTasks = Task::where('is_completed', true)->get();
+        return view('tasks.index', compact('incompleteTasks', 'completedTasks'));
     }
 
     // タスク作成画面
