@@ -16,3 +16,4 @@
 - 完了切り替え用ルート（Route）の追加・調整
 - Blade の構文エラー修正 (@if($tasks->isEmpty()))
 - ローカル環境での動作確認済み
+- TaskController に toggleComplete メソッドを追加
