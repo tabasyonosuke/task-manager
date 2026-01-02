@@ -60,4 +60,14 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('tasks.index');
     }
+
+    // 完了・未完了の切り替え処理
+    public function toggleComplete(Task $task)
+    {
+        $task->update([
+            'is_completed' => !$task->is_completed
+        ]);
+
+        return redirect()->route('tasks.index');
+    }
 }
