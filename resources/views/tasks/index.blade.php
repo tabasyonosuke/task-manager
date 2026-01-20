@@ -5,6 +5,29 @@
 @section('content')
     <h1 class="text-2xl font-bold mb-4">タスク一覧</h1>
 
+    {{-- タスク作成 --}}
+    <form action="{{ route('tasks.store') }}" method="POST" class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        @csrf
+        <div class="flex gap-2">
+            <input 
+                type="text" 
+                name="title" 
+                placeholder="新しいタスクを入力..." 
+                class="flex-1 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+            >
+            <button 
+                type="submit" 
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded font-semibold transition shadow-sm"
+            >
+                追加
+            </button>
+        </div>
+        @error('title')
+            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+        @enderror
+    </form>
+
     {{-- 未完了タスク --}}
     <h2 class="text-lg font-semibold mb-2">未完了</h2>
 
@@ -30,6 +53,14 @@
                     <span >
                         {{ $task->title }}
                     </span>
+
+
+                    {{-- 削除ボタン --}}
+                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');" class="ml-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700">削除</button>
+                    </form>
                 </li>
             @endforeach
         </ul>
@@ -58,6 +89,13 @@
                     <span class="line-through">
                         {{ $task->title }}
                     </span>
+
+                    {{-- 削除ボタン --}}
+                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');" class="ml-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700">削除</button>
+                    </form>
                 </li>
             @endforeach
         </ul>

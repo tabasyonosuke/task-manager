@@ -18,6 +18,6 @@ Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.upda
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
 //完了・未完了の切り替え処理
-Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggleComplete'])->name('tasks.toggle');
 
 
