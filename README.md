@@ -17,3 +17,6 @@
 - Blade の構文エラー修正 (@if($tasks->isEmpty()))
 - ローカル環境での動作確認済み
 - TaskController に toggleComplete メソッドを追加
+- タスク作成機能の実装
+- タスク削除機能の実装
+- 419エラーおよびルート名の不整合を修正
