@@ -8,11 +8,13 @@
     {{-- Vite (TS / CSS 読み込み) --}}
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
 </head>
-<body class="bg-gray-100">
-
-    <div class="container mx-auto py-8">
-        @yield('content')
+{{-- bodyタグの部分をこのように変更 --}}
+<body class="bg-gray-50 text-gray-800 antialiased font-sans">
+    <div class="max-w-2xl mx-auto py-12 px-4">
+        {{-- メインコンテンツ --}}
+        <main class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            @yield('content')
+        </main>
     </div>
-
 </body>
 </html>

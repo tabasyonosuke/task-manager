@@ -23,36 +23,41 @@ class TaskController extends Controller
 
     // DBへ保存
     public function store(Request $request)
-    {
-        $request->validate([
+{
+        // バリデーション
+        $validated = $request->validate([
             'title' => 'required|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
         ]);
 
-        Task::create([
-            'title' => $request->title,
-        ]);
+        // 保存（$request->all() よりも $validated を使う方が安全です）
+        Task::create($validated);
 
-        return redirect()->route('tasks.index');
+        return redirect()->route('tasks.index')->with('success', '新しいタスクを追加しました！');
     }
 
-    // 編集画面
+    // 編集画面の表示
     public function edit(Task $task)
     {
         return view('tasks.edit', compact('task'));
-    }
+    }   
 
-    // 更新処理
+    // データの更新
     public function update(Request $request, Task $task)
     {
-        $request->validate([
+        // バリデーション
+        $validated = $request->validate([
             'title' => 'required|max:255',
-        ]);
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+    ]);
 
-        $task->update([
-            'title' => $request->title,
-        ]);
+        // 更新実行
+        $task->update($validated);
 
-        return redirect()->route('tasks.index');
+        // 一覧へ戻る
+        return redirect()->route('tasks.index')->with('success', 'タスクを更新しました！');
     }
 
     // 削除処理
