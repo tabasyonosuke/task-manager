@@ -7,7 +7,7 @@
 - tasks/index.blade.php 作成
 - php artisan serve と npm run dev を同時に起動して動作確認
 
-## 実装済みタスク(2026-1-2)
+## 実装済みタスク
 - tasks/index.blade.php の実装・修正
 - タスク一覧表示機能
 - 完了 / 未完了の表示切り替え（UI）
