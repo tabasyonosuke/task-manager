@@ -15,11 +15,11 @@
         </div>
     @endif
 
-    {{-- タスク作成フォーム (拡張版) --}}
+    {{-- タスク作成フォーム --}}
     <form action="{{ route('tasks.store') }}" method="POST" class="mb-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100 transition-all focus-within:ring-2 focus-within:ring-blue-100">
         @csrf
         <div class="space-y-4">
-            {{-- 1段目：タイトル --}}
+            {{-- タイトル --}}
             <div class="flex gap-3">
                 <input 
                     type="text" 
@@ -30,7 +30,7 @@
                 >
             </div>
 
-            {{-- 2段目：詳細と期限 --}}
+            {{-- 詳細と期限 --}}
             <div class="flex flex-col md:flex-row gap-3">
                 <textarea 
                     name="description" 
