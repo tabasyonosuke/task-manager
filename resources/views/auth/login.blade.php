@@ -30,7 +30,7 @@
             </div>
         @endif
 
-        {{-- ログイン状態の保持（現場ではほぼ必須！） --}}
+        {{-- ログイン状態の保持 --}}
         <div class="flex items-center">
             <input type="checkbox" name="remember" id="remember" class="rounded border-gray-300 text-blue-600">
             <label for="remember" class="ml-2 text-sm text-gray-600">ログイン状態を保存する</label>

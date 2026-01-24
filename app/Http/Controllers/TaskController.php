@@ -4,16 +4,40 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     // タスク一覧表示
-    public function index()
+    public function index(Request $request)
     {
-        // ログイン中のユーザーのタスクだけを取得
-        $tasks = Auth::user()->tasks()->latest()->get();
+        // 1. ログインユーザーのタスククエリを準備
+        $query = Auth::user()->tasks();
 
-        return view('tasks.index', compact('tasks'));
+        // 2. ソート条件の適用
+        if ($request->get('sort') === 'due_date') {
+            // 期限が近い順
+            $query->orderByRaw('due_date IS NULL, due_date ASC');
+        } else {
+            // 作成が新しい順
+            $query->latest();
+        }
+
+        // 3. 一旦、現在の並び順でデータを取得
+        $allTasks = $query->get();
+
+        // 4. フィルター条件に応じて変数を定義
+        if ($request->get('filter') === 'incomplete') {
+            // 未完了のみモード
+            $incompleteTasks = $allTasks->where('is_completed', false);
+            $completedTasks = collect(); // エラー防止のため空のリストを渡す
+        } else {
+            // すべて表示モード
+            $incompleteTasks = $allTasks->where('is_completed', false);
+            $completedTasks = $allTasks->where('is_completed', true);
+        }
+
+        return view('tasks.index', compact('incompleteTasks', 'completedTasks'));
     }
 
     // タスク作成画面
@@ -28,18 +52,17 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|max:255',
             'due_date' => 'nullable|date',
-    ]);
+        ]);
 
-    // ログイン中のユーザーに紐付けてタスクを作成
-    Auth::user()->tasks()->create([
-        'title' => $request->title,
-        'description' => $request->description,
-        'due_date' => $request->due_date,
-        'is_completed' => false,
-    ]);
+        Auth::user()->tasks()->create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'due_date' => $request->due_date,
+            'is_completed' => false,
+        ]);
 
-    return redirect()->route('tasks.index');
-}
+        return redirect()->route('tasks.index');
+    }
 
     // 編集画面の表示
     public function edit(Task $task)
@@ -50,17 +73,14 @@ class TaskController extends Controller
     // データの更新
     public function update(Request $request, Task $task)
     {
-        // バリデーション
         $validated = $request->validate([
             'title' => 'required|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-    ]);
+        ]);
 
-        // 更新実行
         $task->update($validated);
 
-        // 一覧へ戻る
         return redirect()->route('tasks.index')->with('success', 'タスクを更新しました！');
     }
 

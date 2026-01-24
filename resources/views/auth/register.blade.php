@@ -4,7 +4,7 @@
 <div class="max-w-md mx-auto mt-10 p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
     <h2 class="text-2xl font-bold mb-6">アカウント作成</h2>
 
-    {{-- 全体のエラー表示（デバッグ用） --}}
+    {{-- 全体のエラー表示 --}}
     @if ($errors->any())
         <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
             <ul class="list-disc list-inside text-sm">
