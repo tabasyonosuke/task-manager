@@ -11,10 +11,10 @@ class TaskController extends Controller
     // タスク一覧表示
     public function index(Request $request)
     {
-        // 1. ログインユーザーのタスククエリを準備
+        // ログインユーザーのタスククエリを準備
         $query = Auth::user()->tasks();
 
-        // 2. ソート条件の適用
+        // ソート条件の適用
         if ($request->get('sort') === 'due_date') {
             // 期限が近い順
             $query->orderByRaw('due_date IS NULL, due_date ASC');
@@ -23,10 +23,10 @@ class TaskController extends Controller
             $query->latest();
         }
 
-        // 3. 一旦、現在の並び順でデータを取得
+        // 一旦、現在の並び順でデータを取得
         $allTasks = $query->get();
 
-        // 4. フィルター条件に応じて変数を定義
+        // フィルター条件に応じて変数を定義
         if ($request->get('filter') === 'incomplete') {
             // 未完了のみモード
             $incompleteTasks = $allTasks->where('is_completed', false);

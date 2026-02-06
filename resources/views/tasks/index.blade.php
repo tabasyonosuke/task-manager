@@ -16,17 +16,20 @@
     @endif
 
     {{-- タスク作成フォーム --}}
-    <form action="{{ route('tasks.store') }}" method="POST" class="mb-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100 transition-all focus-within:ring-2 focus-within:ring-blue-100">
+    <form action="{{ route('tasks.store') }}" method="POST" id="task-form" class="mb-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100 transition-all focus-within:ring-2 focus-within:ring-blue-100">
         @csrf
         <div class="space-y-4">
-            <div class="flex gap-3">
+            <div class="flex flex-col gap-1">
                 <input 
                     type="text" 
+                    id="task-title-input" {{-- IDを追加 --}}
                     name="title" 
                     placeholder="新しいタスクを入力..." 
                     class="flex-1 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
                     required
                 >
+                {{-- TS用エラーメッセージ表示エリア --}}
+                <p id="title-error-msg" class="text-red-500 text-xs mt-1 hidden"></p>
             </div>
 
             <div class="flex flex-col md:flex-row gap-3">
@@ -45,7 +48,8 @@
                     >
                     <button 
                         type="submit" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-xl font-bold transition-all transform active:scale-95 shadow-md shadow-blue-200 whitespace-nowrap"
+                        id="submit-button" {{-- IDを追加 --}}
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-xl font-bold transition-all transform active:scale-95 shadow-md shadow-blue-200 whitespace-nowrap disabled:bg-gray-400 disabled:shadow-none"
                     >
                         追加
                     </button>

@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>
+    {{-- 重要：非同期通信(Ajax)で必要なCSRFトークン --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <title>@yield('title', 'Task Manager')</title>
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased font-sans">
     <div class="max-w-2xl mx-auto py-12 px-4">
         
-        {{-- 追加: ナビゲーションエリア --}}
+        {{-- ナビゲーションエリア --}}
         <div class="flex justify-between items-center mb-6 px-2">
             <h1 class="text-xl font-bold text-gray-700">
                 <a href="{{ route('tasks.index') }}">Task Manager</a>
