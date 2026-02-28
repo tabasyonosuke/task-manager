@@ -22,13 +22,12 @@
             <div class="flex flex-col gap-1">
                 <input 
                     type="text" 
-                    id="task-title-input" {{-- IDを追加 --}}
+                    id="task-title-input"
                     name="title" 
                     placeholder="新しいタスクを入力..." 
                     class="flex-1 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
                     required
                 >
-                {{-- TS用エラーメッセージ表示エリア --}}
                 <p id="title-error-msg" class="text-red-500 text-xs mt-1 hidden"></p>
             </div>
 
@@ -48,7 +47,7 @@
                     >
                     <button 
                         type="submit" 
-                        id="submit-button" {{-- IDを追加 --}}
+                        id="submit-button"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-xl font-bold transition-all transform active:scale-95 shadow-md shadow-blue-200 whitespace-nowrap disabled:bg-gray-400 disabled:shadow-none"
                     >
                         追加
@@ -61,15 +60,47 @@
         @enderror
     </form>
 
+    {{-- 検索フォーム --}}
+    <div class="mb-6">
+        <form action="{{ route('tasks.index') }}" method="GET" class="flex gap-2">
+            {{-- ソートとフィルターの状態を隠しパラメータで引き継ぐ --}}
+            <input type="hidden" name="sort" value="{{ request('sort') }}">
+            <input type="hidden" name="filter" value="{{ request('filter') }}">
+            
+            <div class="relative flex-1">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    placeholder="タスクのタイトルで検索..." 
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                >
+            </div>
+            <button type="submit" class="bg-gray-800 text-white px-5 py-2 rounded-xl font-medium hover:bg-gray-900 transition-colors text-sm">
+                検索
+            </button>
+            @if(request('search'))
+                <a href="{{ route('tasks.index', request()->except('search')) }}" class="flex items-center text-sm text-gray-500 hover:text-gray-700 underline px-2">
+                    クリア
+                </a>
+            @endif
+        </form>
+    </div>
+
     {{-- ソート・フィルターメニュー --}}
     <div class="flex flex-wrap justify-between items-center mb-8 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
         <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">表示:</span>
-            <a href="{{ route('tasks.index', ['sort' => request('sort')]) }}" 
+            <a href="{{ route('tasks.index', ['sort' => request('sort'), 'search' => request('search')]) }}" 
                class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all {{ !request('filter') ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-gray-500 hover:bg-gray-100' }}">
                すべて
             </a>
-            <a href="{{ route('tasks.index', ['filter' => 'incomplete', 'sort' => request('sort')]) }}" 
+            <a href="{{ route('tasks.index', ['filter' => 'incomplete', 'sort' => request('sort'), 'search' => request('search')]) }}" 
                class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all {{ request('filter') === 'incomplete' ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-gray-500 hover:bg-gray-100' }}">
                未完了のみ
             </a>
@@ -78,11 +109,11 @@
         <div class="flex items-center gap-4">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">並び替え:</span>
             <div class="flex bg-gray-100 p-1 rounded-xl">
-                <a href="{{ route('tasks.index', ['filter' => request('filter'), 'sort' => 'created_at']) }}" 
+                <a href="{{ route('tasks.index', ['filter' => request('filter'), 'sort' => 'created_at', 'search' => request('search')]) }}" 
                    class="px-3 py-1 rounded-lg text-xs font-bold transition-all {{ request('sort') !== 'due_date' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                    作成順
                 </a>
-                <a href="{{ route('tasks.index', ['filter' => request('filter'), 'sort' => 'due_date']) }}" 
+                <a href="{{ route('tasks.index', ['filter' => request('filter'), 'sort' => 'due_date', 'search' => request('search')]) }}" 
                    class="px-3 py-1 rounded-lg text-xs font-bold transition-all {{ request('sort') === 'due_date' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                    期限順
                 </a>
@@ -102,12 +133,13 @@
             <ul class="space-y-3">
                 @foreach($incompleteTasks as $task)
                     <li class="group flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:border-blue-200 hover:shadow-lg hover:shadow-gray-100 transition-all">
-                        <form action="{{ route('tasks.toggle', $task) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 transition-colors">
-                            </button>
-                        </form>
+                        {{-- Ajax対応チェックボックス --}}
+                        <input 
+                            type="checkbox" 
+                            class="task-toggle-checkbox w-6 h-6 rounded-full border-2 border-gray-300 focus:ring-0 cursor-pointer transition-colors"
+                            data-id="{{ $task->id }}"
+                            {{ $task->is_completed ? 'checked' : '' }}
+                        >
 
                         <div class="flex flex-col flex-1 gap-1">
                             <span class="text-gray-700 font-semibold tracking-wide">{{ $task->title }}</span>
@@ -155,13 +187,13 @@
             <ul class="space-y-2 opacity-60">
                 @foreach($completedTasks as $task)
                     <li class="flex items-center gap-4 p-3 bg-gray-100 border border-transparent rounded-xl">
-                        <form action="{{ route('tasks.toggle', $task) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </button>
-                        </form>
+                        {{-- Ajax対応チェックボックス (完了済み) --}}
+                        <input 
+                            type="checkbox" 
+                            class="task-toggle-checkbox w-5 h-5 rounded-full border-2 border-gray-400 bg-gray-400 checked:bg-gray-400 focus:ring-0 cursor-pointer"
+                            data-id="{{ $task->id }}"
+                            checked
+                        >
                         <div class="flex flex-col flex-1 gap-1">
                             <span class="text-gray-500 line-through italic">{{ $task->title }}</span>
                         </div>

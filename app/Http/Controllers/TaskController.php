@@ -8,25 +8,32 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    // タスク一覧表示
+    /**
+     * タスク一覧表示（検索・ソート・フィルター対応）
+     */
     public function index(Request $request)
     {
-        // ログインユーザーのタスククエリを準備
+        // 1. ログインユーザーのタスククエリを準備
         $query = Auth::user()->tasks();
 
-        // ソート条件の適用
+        // 2. 【追加】検索キーワードがある場合、タイトルを曖昧検索
+        if ($search = $request->get('search')) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // 3. ソート条件の適用
         if ($request->get('sort') === 'due_date') {
-            // 期限が近い順
+            // 期限が近い順（NULLは後ろに回す）
             $query->orderByRaw('due_date IS NULL, due_date ASC');
         } else {
             // 作成が新しい順
             $query->latest();
         }
 
-        // 一旦、現在の並び順でデータを取得
+        // 4. クエリを実行してデータを取得
         $allTasks = $query->get();
 
-        // フィルター条件に応じて変数を定義
+        // 5. フィルター条件に応じて変数を定義
         if ($request->get('filter') === 'incomplete') {
             // 未完了のみモード
             $incompleteTasks = $allTasks->where('is_completed', false);
@@ -91,12 +98,24 @@ class TaskController extends Controller
         return redirect()->route('tasks.index');
     }
 
-    // 完了・未完了の切り替え処理
+    /**
+     * 完了・未完了の切り替え処理（Ajax対応）
+     */
     public function toggleComplete(Task $task)
     {
         $task->update([
             'is_completed' => !$task->is_completed
         ]);
+
+        // Ajaxからのリクエストかどうかを判定
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'id' => $task->id,
+                'is_completed' => $task->is_completed,
+                'message' => 'ステータスを更新しました'
+            ]);
+        }
 
         return redirect()->route('tasks.index');
     }
