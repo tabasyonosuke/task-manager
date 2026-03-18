@@ -41,14 +41,11 @@ const initAjaxToggle = (): void => {
             
             if (!taskId) return;
 
-            // 二重送信防止
             target.disabled = true;
 
             try {
-                // CSRFトークンの取得
                 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content;
 
-                // サーバーへPATCHリクエストを送信
                 const response = await fetch(`/tasks/${taskId}/toggle`, {
                     method: 'PATCH',
                     headers: {
@@ -59,16 +56,14 @@ const initAjaxToggle = (): void => {
                 });
 
                 if (response.ok) {
-                    console.log(`Task ${taskId} updated via Ajax!`);
-                    
                     location.reload(); 
                 } else {
                     throw new Error('サーバーエラーが発生しました');
                 }
             } catch (error) {
                 console.error('Ajax Error:', error);
-                alert('通信に失敗しました。ページを再読み込みしてやり直してください。');
-                target.checked = !target.checked; // 失敗したので元のチェック状態に戻す
+                alert('通信に失敗しました。');
+                target.checked = !target.checked;
             } finally {
                 target.disabled = false;
             }
@@ -76,8 +71,38 @@ const initAjaxToggle = (): void => {
     });
 };
 
-// ページの読み込みが終わったらすべての機能を起動
+/**
+ * 【追加】フロントエンドでのリアルタイム検索
+ */
+const initSearch = (): void => {
+    // 検索窓を取得 (index.blade.php の name="search" を指定)
+    const searchInput = document.querySelector('input[name="search"]') as HTMLInputElement | null;
+    // 全てのタスクアイテム (li.group) を取得
+    const taskItems = document.querySelectorAll<HTMLLIElement>('li.group');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', () => {
+        const keyword = searchInput.value.toLowerCase();
+
+        taskItems.forEach(item => {
+            // タスク名のテキストが含まれる要素 (tracking-wideクラス) を取得
+            const titleElement = item.querySelector('.tracking-wide');
+            const titleText = titleElement?.textContent?.toLowerCase() || '';
+            
+            // キーワードが含まれているか判定して表示/非表示を切り替え
+            if (titleText.includes(keyword)) {
+                item.style.setProperty('display', 'flex', 'important'); 
+            } else {
+                item.style.setProperty('display', 'none', 'important');
+            }
+        });
+    });
+};
+
+// すべての機能を起動
 document.addEventListener('DOMContentLoaded', () => {
     initValidation();
     initAjaxToggle();
+    initSearch(); // これを忘れずに呼ぶ
 });
