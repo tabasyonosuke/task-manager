@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{-- 重要：非同期通信(Ajax)で必要なCSRFトークン --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>@yield('title', 'Task Manager')</title>

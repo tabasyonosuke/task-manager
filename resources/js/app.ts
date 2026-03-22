@@ -1,6 +1,45 @@
-/**
- * フォームのリアルタイム・バリデーション設定
- */
+//共有相手の入力行を動的に追加・削除する
+const initShareHandler = (): void => {
+    const container = document.getElementById('share-emails-container') as HTMLDivElement | null;
+    const addBtn = document.getElementById('add-email-btn') as HTMLButtonElement | null;
+
+    if (!container || !addBtn) return;
+
+    addBtn.addEventListener('click', () => {
+        // 1. 外側のラッパー作成
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex gap-2 animate-fade-in items-center';
+
+        // 2. 入力欄の作成
+        const input = document.createElement('input');
+        input.type = 'email';
+        input.name = 'share_emails[]';
+        input.placeholder = 'メールアドレス';
+        input.className = 'flex-1 border-gray-100 rounded-xl text-sm focus:border-blue-400 focus:ring-0 bg-gray-50/50 transition-all font-medium placeholder-gray-300';
+
+        // 3. 削除ボタンの作成
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'p-2 text-gray-300 hover:text-red-500 transition-colors group';
+        removeBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        `;
+
+        // 4. 削除イベントの紐付け
+        removeBtn.addEventListener('click', () => {
+            wrapper.remove();
+        });
+
+        // 5. DOMへの追加
+        wrapper.appendChild(input);
+        wrapper.appendChild(removeBtn);
+        container.appendChild(wrapper);
+    });
+};
+
+// フォームのリアルタイム・バリデーション設定
 const initValidation = (): void => {
     const titleInput = document.getElementById('task-title-input') as HTMLInputElement | null;
     const errorDisplay = document.getElementById('title-error-msg') as HTMLParagraphElement | null;
@@ -28,9 +67,7 @@ const initValidation = (): void => {
     });
 };
 
-/**
- * 非同期でのタスク完了状態切り替え
- */
+// 非同期でのタスク完了状態切り替え
 const initAjaxToggle = (): void => {
     const taskCheckboxes = document.querySelectorAll<HTMLInputElement>('.task-toggle-checkbox');
 
@@ -71,13 +108,9 @@ const initAjaxToggle = (): void => {
     });
 };
 
-/**
- * 【追加】フロントエンドでのリアルタイム検索
- */
+// フロントエンドでのリアルタイム検索
 const initSearch = (): void => {
-    // 検索窓を取得 (index.blade.php の name="search" を指定)
     const searchInput = document.querySelector('input[name="search"]') as HTMLInputElement | null;
-    // 全てのタスクアイテム (li.group) を取得
     const taskItems = document.querySelectorAll<HTMLLIElement>('li.group');
 
     if (!searchInput) return;
@@ -86,11 +119,9 @@ const initSearch = (): void => {
         const keyword = searchInput.value.toLowerCase();
 
         taskItems.forEach(item => {
-            // タスク名のテキストが含まれる要素 (tracking-wideクラス) を取得
-            const titleElement = item.querySelector('.tracking-wide');
+            const titleElement = item.querySelector('.truncate');
             const titleText = titleElement?.textContent?.toLowerCase() || '';
             
-            // キーワードが含まれているか判定して表示/非表示を切り替え
             if (titleText.includes(keyword)) {
                 item.style.setProperty('display', 'flex', 'important'); 
             } else {
@@ -104,5 +135,6 @@ const initSearch = (): void => {
 document.addEventListener('DOMContentLoaded', () => {
     initValidation();
     initAjaxToggle();
-    initSearch(); // これを忘れずに呼ぶ
+    initSearch();
+    initShareHandler();
 });

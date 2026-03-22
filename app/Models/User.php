@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -46,7 +48,22 @@ class User extends Authenticatable
         ];
     }
 
-    public function tasks() {
-    return $this->hasMany(Task::class);
-}
+    /**
+     * 自分が作成したタスク
+     * 自分がオーナーであるタスクを取得します。
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    /**
+     * 自分に共有されたタスク
+     * 中間テーブル 'task_user' を介して、他のユーザーから共有されたタスクを取得
+     */
+    public function sharedTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class, 'task_user')
+                    ->withTimestamps();
+    }
 }
